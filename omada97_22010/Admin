@@ -1,0 +1,34 @@
+package com.example.demo.admin; // Ορισμός του πακέτου όπου ανήκει η κλάση Admin
+
+import com.example.demo.user.User; // Εισαγωγή της κλάσης User, καθώς ο Admin κληρονομεί από αυτήν
+import com.example.demo.property.Property; // Εισαγωγή της κλάσης Property, καθώς ο Admin μπορεί να εγκρίνει ακίνητα
+import org.springframework.stereotype.Component; // Εισαγωγή του @Component ώστε το Spring να διαχειρίζεται την κλάση
+
+/**
+ * Η κλάση Admin αντιπροσωπεύει έναν διαχειριστή του συστήματος.
+ * Ο Admin κληρονομεί όλες τις ιδιότητες και μεθόδους από την κλάση User και επιπλέον
+ * μπορεί να εγκρίνει ακίνητα και να επαληθεύει ενοικιαστές.
+ */
+@Component // Δηλώνει ότι η κλάση αυτή είναι ένα Spring Bean και μπορεί να χρησιμοποιηθεί σε άλλες κλάσεις μέσω @Autowired
+public class Admin extends User { // Η κλάση Admin κληρονομεί από την κλάση User
+
+    /**
+     * Μέθοδος που επιτρέπει στον διαχειριστή (Admin) να εγκρίνει ένα ακίνητο.
+     * Αλλάζει την κατάσταση του ακινήτου σε "Approved".
+     *
+     * @param property Το ακίνητο που πρόκειται να εγκριθεί
+     */
+    public void approveProperty(Property property) {
+        property.setStatus("Approved"); // Ορισμός της κατάστασης του ακινήτου ως "Approved" (Εγκρίθηκε)
+    }
+
+    /**
+     * Μέθοδος που επιτρέπει στον διαχειριστή (Admin) να επαληθεύσει έναν ενοικιαστή (Tenant).
+     * Ορίζει την κατάσταση επαλήθευσης του χρήστη σε true.
+     *
+     * @param tenant Ο ενοικιαστής που πρόκειται να επαληθευτεί
+     */
+    public void verifyTenant(User tenant) {
+        tenant.setVerified(true); // Ορισμός του χρήστη ως επαληθευμένου
+    }
+}

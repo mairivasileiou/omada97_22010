@@ -1,0 +1,42 @@
+package com.example.demo.admin; // Ορισμός του πακέτου όπου ανήκει η κλάση AdminController
+
+import com.example.demo.property.Property; // Εισαγωγή της κλάσης Property, καθώς ο Admin μπορεί να εγκρίνει ακίνητα
+import com.example.demo.user.User; // Εισαγωγή της κλάσης User, καθώς ο Admin μπορεί να επαληθεύει ενοικιαστές
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.web.bind.annotation.*; // Εισαγωγή των annotations για τη διαχείριση REST API endpoints
+
+/**
+ * Η κλάση AdminController διαχειρίζεται τα REST API endpoints που σχετίζονται με τις λειτουργίες του διαχειριστή (Admin).
+ * Παρέχει endpoints για την έγκριση ακινήτων και την επαλήθευση ενοικιαστών.
+ */
+@RestController // Δηλώνει ότι αυτή η κλάση είναι REST Controller και επιστρέφει JSON απαντήσεις
+@RequestMapping("/admin") // Ορίζει ότι όλα τα endpoints αυτής της κλάσης θα ξεκινούν με "/admin"
+public class AdminController {
+
+    @Autowired // Αυτόματη έγχυση του AdminService για τη διαχείριση της επιχειρησιακής λογικής
+    private AdminService adminService;
+
+    /**
+     * Endpoint που επιτρέπει στον Admin να εγκρίνει ένα ακίνητο.
+     * Χρησιμοποιεί την HTTP μέθοδο PUT για να ενημερώσει την κατάσταση του ακινήτου σε "Approved".
+     *
+     * @param property Τα δεδομένα του ακινήτου που θα εγκριθεί (λαμβάνονται από το request body)
+     * @return Το ακίνητο με ενημερωμένη την κατάσταση του
+     */
+    @PutMapping("/approve-property") // Ορίζει ότι το endpoint "/admin/approve-property" δέχεται αιτήματα τύπου PUT
+    public Property approveProperty(@RequestBody Property property) { // Το @RequestBody διαβάζει τα δεδομένα JSON από το request
+        return adminService.approveProperty(property); // Καλεί την υπηρεσία για έγκριση του ακινήτου
+    }
+
+    /**
+     * Endpoint που επιτρέπει στον Admin να επαληθεύσει έναν ενοικιαστή.
+     * Χρησιμοποιεί την HTTP μέθοδο PUT για να ενημερώσει την κατάσταση του χρήστη ως "verified".
+     *
+     * @param tenantId Το ID του ενοικιαστή που θα επαληθευτεί (λαμβάνεται από το path της URL)
+     * @return Ο ενημερωμένος χρήστης μετά την επαλήθευση
+     */
+    @PutMapping("/verify-tenant/{tenantId}") // Ορίζει ότι το endpoint "/admin/verify-tenant/{tenantId}" δέχεται αιτήματα τύπου PUT
+    public User verifyTenant(@PathVariable Long tenantId) { // Το @PathVariable διαβάζει το tenantId από το URL
+        return adminService.verifyTenant(tenantId); // Καλεί την υπηρεσία για να επαληθεύσει τον ενοικιαστή
+    }
+}

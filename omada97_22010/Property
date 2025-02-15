@@ -1,0 +1,128 @@
+package com.example.demo.property; // Ορισμός του πακέτου όπου ανήκει η κλάση Property
+
+import jakarta.persistence.*; // Εισαγωγή των annotations του JPA για τη διαχείριση της βάσης δεδομένων
+import java.time.LocalDateTime; // Εισαγωγή της κλάσης LocalDateTime για την αποθήκευση χρονικών στιγμών
+
+/**
+ * Η κλάση Property αναπαριστά ένα ακίνητο που μπορεί να καταχωρηθεί στην πλατφόρμα ενοικίασης.
+ * Αποθηκεύεται στη βάση δεδομένων και συνδέεται με έναν ιδιοκτήτη (Landlord).
+ */
+@Entity // Δηλώνει ότι αυτή η κλάση είναι οντότητα στη βάση δεδομένων
+public class Property {
+
+    @Id // Ορισμός του primary key της οντότητας
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Αυτόματη αύξηση του ID από τη βάση δεδομένων
+    private Long propertyId; // Μοναδικό αναγνωριστικό του ακινήτου (Primary Key)
+
+    private Long ownerId; // Συνδέει το ακίνητο με τον ιδιοκτήτη του (User)
+
+    private String description; // Περιγραφή του ακινήτου
+
+    private String address; // Διεύθυνση του ακινήτου
+
+    private double price; // Τιμή ενοικίασης του ακινήτου
+
+    private String status; // Κατάσταση του ακινήτου ("Pending", "Approved", "Rejected")
+
+    private LocalDateTime createdDate; // Ημερομηνία δημιουργίας της καταχώρησης του ακινήτου
+
+    // =========================== Getters & Setters ===========================
+
+    /**
+     * Επιστρέφει το μοναδικό αναγνωριστικό του ακινήτου.
+     */
+    public Long getPropertyId() {
+        return propertyId;
+    }
+
+    /**
+     * Ορίζει το μοναδικό αναγνωριστικό του ακινήτου.
+     */
+    public void setPropertyId(Long propertyId) {
+        this.propertyId = propertyId;
+    }
+
+    /**
+     * Επιστρέφει το αναγνωριστικό του ιδιοκτήτη του ακινήτου.
+     */
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    /**
+     * Ορίζει το αναγνωριστικό του ιδιοκτήτη του ακινήτου.
+     */
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    /**
+     * Επιστρέφει την περιγραφή του ακινήτου.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Ορίζει την περιγραφή του ακινήτου.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Επιστρέφει τη διεύθυνση του ακινήτου.
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * Ορίζει τη διεύθυνση του ακινήτου.
+     */
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    /**
+     * Επιστρέφει την τιμή ενοικίασης του ακινήτου.
+     */
+    public double getPrice() {
+        return price;
+    }
+
+    /**
+     * Ορίζει την τιμή ενοικίασης του ακινήτου.
+     */
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    /**
+     * Επιστρέφει την τρέχουσα κατάσταση του ακινήτου.
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * Ορίζει την κατάσταση του ακινήτου (π.χ. "Pending", "Approved", "Rejected").
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * Επιστρέφει την ημερομηνία δημιουργίας του ακινήτου.
+     */
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    /**
+     * Ορίζει την ημερομηνία δημιουργίας του ακινήτου.
+     */
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+}

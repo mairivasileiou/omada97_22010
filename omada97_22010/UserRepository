@@ -1,0 +1,20 @@
+package com.example.demo.user; // Ορισμός του πακέτου όπου ανήκει το UserRepository
+
+import org.springframework.data.jpa.repository.JpaRepository; // Εισαγωγή του JpaRepository για τη διαχείριση των χρηστών στη βάση δεδομένων
+
+/**
+ * Το UserRepository είναι ένα interface που παρέχει τις βασικές λειτουργίες διαχείρισης χρηστών.
+ * Επεκτείνει το JpaRepository, το οποίο επιτρέπει CRUD λειτουργίες (Create, Read, Update, Delete)
+ * χωρίς την ανάγκη να γράψουμε SQL queries.
+ */
+public interface UserRepository extends JpaRepository<User, Long> { // Ορίζει το Repository για την οντότητα User με Primary Key τύπου Long
+
+    /**
+     * Μέθοδος για αναζήτηση χρήστη στη βάση δεδομένων με βάση το username.
+     * Χρησιμοποιείται για τη διαδικασία αυθεντικοποίησης (login).
+     *
+     * @param username Το όνομα χρήστη που αναζητούμε
+     * @return Το αντικείμενο User αν βρεθεί στη βάση, διαφορετικά επιστρέφει null
+     */
+    User findByUsername(String username); // Μέθοδος για εύρεση χρήστη μέσω του ονόματος χρήστη
+}

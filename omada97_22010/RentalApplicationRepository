@@ -1,0 +1,31 @@
+package com.example.demo.rentalapplication; // Ορισμός του πακέτου όπου ανήκει η διεπαφή RentalApplicationRepository
+
+import org.springframework.data.jpa.repository.JpaRepository; // Εισαγωγή του JpaRepository για τη διαχείριση της βάσης δεδομένων
+import java.util.List; // Εισαγωγή της λίστας για την επιστροφή πολλαπλών αποτελεσμάτων
+
+/**
+ * Το RentalApplicationRepository είναι ένα interface που παρέχει τις βασικές λειτουργίες διαχείρισης αιτήσεων ενοικίασης.
+ * Επεκτείνει το JpaRepository, το οποίο επιτρέπει CRUD λειτουργίες (Create, Read, Update, Delete)
+ * χωρίς την ανάγκη να γράψουμε SQL queries.
+ */
+public interface RentalApplicationRepository extends JpaRepository<RentalApplication, Long> { // Ορίζει το Repository για την οντότητα RentalApplication με Primary Key τύπου Long
+
+    /**
+     * Μέθοδος που επιστρέφει όλες τις αιτήσεις ενοικίασης που σχετίζονται με ένα συγκεκριμένο ακίνητο.
+     * Χρησιμοποιείται από τον ιδιοκτήτη του ακινήτου για να δει τις αιτήσεις που έχουν υποβληθεί για το ακίνητό του.
+     *
+     * @param propertyId Το ID του ακινήτου για το οποίο αναζητούμε αιτήσεις
+     * @return Λίστα με όλες τις αιτήσεις που έχουν υποβληθεί για το συγκεκριμένο ακίνητο
+     */
+    List<RentalApplication> findByPropertyId(Long propertyId); // Επιστρέφει όλες τις αιτήσεις που ανήκουν σε ένα συγκεκριμένο ακίνητο
+
+    /**
+     * Μέθοδος που επιστρέφει όλες τις αιτήσεις ενοικίασης που έχει υποβάλει ένας συγκεκριμένος ενοικιαστής.
+     * Χρησιμοποιείται από τον ενοικιαστή για να δει τις αιτήσεις που έχει κάνει.
+     *
+     * @param tenantId Το ID του ενοικιαστή για τον οποίο αναζητούμε αιτήσεις
+     * @return Λίστα με όλες τις αιτήσεις που έχει υποβάλει ο συγκεκριμένος ενοικιαστής
+     */
+    List<RentalApplication> findByTenantId(Long tenantId); // Επιστρέφει όλες τις αιτήσεις ενός συγκεκριμένου ενοικιαστή
+}
+

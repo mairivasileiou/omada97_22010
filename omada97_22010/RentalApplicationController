@@ -1,0 +1,66 @@
+package com.example.demo.rentalapplication; // Ορισμός του πακέτου όπου ανήκει η κλάση RentalApplicationController
+
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.web.bind.annotation.*; // Εισαγωγή των annotations για τη διαχείριση REST API endpoints
+import java.util.List; // Εισαγωγή της κλάσης List για την επιστροφή λίστας αιτήσεων ενοικίασης
+
+/**
+ * Η κλάση RentalApplicationController διαχειρίζεται τα REST API endpoints που σχετίζονται με τις αιτήσεις ενοικίασης.
+ * Επιτρέπει την υποβολή, προβολή και ενημέρωση αιτήσεων.
+ */
+@RestController // Δηλώνει ότι αυτή η κλάση είναι REST Controller και επιστρέφει JSON απαντήσεις
+@RequestMapping("/rental-applications") // Ορίζει ότι όλα τα endpoints αυτής της κλάσης θα ξεκινούν με "/rental-applications"
+public class RentalApplicationController {
+
+    @Autowired // Αυτόματη έγχυση του RentalApplicationService για τη διαχείριση της επιχειρησιακής λογικής
+    private RentalApplicationService rentalApplicationService;
+
+    /**
+     * Endpoint για την υποβολή νέας αίτησης ενοικίασης.
+     * Χρησιμοποιεί την HTTP μέθοδο POST για να καταχωρήσει μια νέα αίτηση στη βάση δεδομένων.
+     *
+     * @param rentalApplication Τα δεδομένα της αίτησης που θα υποβληθεί (λαμβάνονται από το request body)
+     * @return Η αποθηκευμένη αίτηση στη βάση δεδομένων
+     */
+    @PostMapping // Ορίζει ότι το endpoint "/rental-applications" δέχεται αιτήματα τύπου POST
+    public RentalApplication submitApplication(@RequestBody RentalApplication rentalApplication) { 
+        return rentalApplicationService.submitApplication(rentalApplication); // Καλεί την υπηρεσία για την υποβολή της αίτησης
+    }
+
+    /**
+     * Endpoint που επιστρέφει όλες τις αιτήσεις που έχουν γίνει για ένα συγκεκριμένο ακίνητο.
+     * Χρησιμοποιείται από τους ιδιοκτήτες για να δουν τις αιτήσεις των ενοικιαστών.
+     *
+     * @param propertyId Το ID του ακινήτου για το οποίο αναζητούμε αιτήσεις (λαμβάνεται από το path της URL)
+     * @return Λίστα με όλες τις αιτήσεις που έχουν υποβληθεί για το συγκεκριμένο ακίνητο
+     */
+    @GetMapping("/property/{propertyId}") // Ορίζει ότι το endpoint "/rental-applications/property/{propertyId}" δέχεται αιτήματα τύπου GET
+    public List<RentalApplication> getApplicationsByProperty(@PathVariable Long propertyId) { 
+        return rentalApplicationService.getApplicationsByProperty(propertyId); // Καλεί την υπηρεσία για ανάκτηση των αιτήσεων του ακινήτου
+    }
+
+    /**
+     * Endpoint που επιστρέφει όλες τις αιτήσεις που έχει υποβάλει ένας συγκεκριμένος ενοικιαστής.
+     * Χρησιμοποιείται από τους ενοικιαστές για να δουν τις αιτήσεις τους.
+     *
+     * @param tenantId Το ID του ενοικιαστή που αναζητά τις αιτήσεις του (λαμβάνεται από το path της URL)
+     * @return Λίστα με όλες τις αιτήσεις του συγκεκριμένου ενοικιαστή
+     */
+    @GetMapping("/tenant/{tenantId}") // Ορίζει ότι το endpoint "/rental-applications/tenant/{tenantId}" δέχεται αιτήματα τύπου GET
+    public List<RentalApplication> getApplicationsByTenant(@PathVariable Long tenantId) { 
+        return rentalApplicationService.getApplicationsByTenant(tenantId); // Καλεί την υπηρεσία για ανάκτηση των αιτήσεων του ενοικιαστή
+    }
+
+    /**
+     * Endpoint για την ενημέρωση της κατάστασης μιας αίτησης ενοικίασης (π.χ. "Approved", "Rejected").
+     * Χρησιμοποιείται από τον ιδιοκτήτη για να αποδεχθεί ή να απορρίψει μια αίτηση.
+     *
+     * @param applicationId Το ID της αίτησης που θα ενημερωθεί (λαμβάνεται από το path της URL)
+     * @param status Η νέα κατάσταση που θα οριστεί στην αίτηση (λαμβάνεται ως request parameter)
+     * @return Η ενημερωμένη αίτηση μετά την αποθήκευση στη βάση δεδομένων
+     */
+    @PutMapping("/{applicationId}") // Ορίζει ότι το endpoint "/rental-applications/{applicationId}" δέχεται αιτήματα τύπου PUT
+    public RentalApplication updateStatus(@PathVariable Long applicationId, @RequestParam String status) { 
+        return rentalApplicationService.updateStatus(applicationId, status); // Καλεί την υπηρεσία για ενημέρωση της κατάστασης της αίτησης
+    }
+}

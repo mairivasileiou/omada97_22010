@@ -1,0 +1,71 @@
+package com.example.demo.rentalapplication; // Ορισμός του πακέτου όπου ανήκει η κλάση RentalApplicationService
+
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.stereotype.Service; // Εισαγωγή του @Service για τον ορισμό της κλάσης ως υπηρεσία (service)
+import java.util.List; // Εισαγωγή της κλάσης List για την επιστροφή λίστας αιτήσεων ενοικίασης
+
+/**
+ * Η κλάση RentalApplicationService παρέχει τις επιχειρησιακές λειτουργίες (business logic)
+ * για τη διαχείριση των αιτήσεων ενοικίασης.
+ * Επικοινωνεί με το RentalApplicationRepository για να αποθηκεύει και να ανακτά δεδομένα από τη βάση.
+ */
+@Service // Δηλώνει ότι αυτή η κλάση είναι Spring Service και μπορεί να χρησιμοποιηθεί μέσω @Autowired
+public class RentalApplicationService {
+
+    @Autowired // Αυτόματη έγχυση του RentalApplicationRepository για τη διαχείριση των αιτήσεων ενοικίασης στη βάση δεδομένων
+    private RentalApplicationRepository rentalApplicationRepository;
+
+    /**
+     * Υποβάλλει μια νέα αίτηση ενοικίασης.
+     * Θέτει αυτόματα την κατάσταση της αίτησης σε "Pending" και καταγράφει την ημερομηνία υποβολής.
+     *
+     * @param rentalApplication Τα δεδομένα της αίτησης που θα υποβληθεί
+     * @return Η αποθηκευμένη αίτηση στη βάση δεδομένων
+     */
+    public RentalApplication submitApplication(RentalApplication rentalApplication) {
+        rentalApplication.submitApplication(); // Ορισμός κατάστασης σε "Pending" και ημερομηνίας υποβολής
+        return rentalApplicationRepository.save(rentalApplication); // Αποθήκευση της αίτησης στη βάση δεδομένων
+    }
+
+    /**
+     * Επιστρέφει όλες τις αιτήσεις που έχουν γίνει για ένα συγκεκριμένο ακίνητο.
+     * Χρησιμοποιείται από τους ιδιοκτήτες για να δουν τις αιτήσεις των ενοικιαστών.
+     *
+     * @param propertyId Το ID του ακινήτου για το οποίο αναζητούμε αιτήσεις
+     * @return Λίστα με όλες τις αιτήσεις που έχουν υποβληθεί για το συγκεκριμένο ακίνητο
+     */
+    public List<RentalApplication> getApplicationsByProperty(Long propertyId) {
+        return rentalApplicationRepository.findByPropertyId(propertyId); // Ανακτά όλες τις αιτήσεις που σχετίζονται με το συγκεκριμένο ακίνητο
+    }
+
+    /**
+     * Επιστρέφει όλες τις αιτήσεις που έχει υποβάλει ένας συγκεκριμένος ενοικιαστής.
+     * Χρησιμοποιείται από τους ενοικιαστές για να δουν τις αιτήσεις τους.
+     *
+     * @param tenantId Το ID του ενοικιαστή που αναζητά τις αιτήσεις του
+     * @return Λίστα με όλες τις αιτήσεις του συγκεκριμένου ενοικιαστή
+     */
+    public List<RentalApplication> getApplicationsByTenant(Long tenantId) {
+        return rentalApplicationRepository.findByTenantId(tenantId); // Ανακτά όλες τις αιτήσεις που έχουν γίνει από τον συγκεκριμένο ενοικιαστή
+    }
+
+    /**
+     * Ενημερώνει την κατάσταση μιας αίτησης ενοικίασης (π.χ. "Approved", "Rejected").
+     * Χρησιμοποιείται από τον ιδιοκτήτη για να αποδεχθεί ή να απορρίψει μια αίτηση.
+     *
+     * @param applicationId Το ID της αίτησης που θα ενημερωθεί
+     * @param newStatus Η νέα κατάσταση που θα οριστεί στην αίτηση
+     * @return Η ενημερωμένη αίτηση μετά την αποθήκευση στη βάση δεδομένων
+     */
+    public RentalApplication updateStatus(Long applicationId, String newStatus) {
+        // Αναζήτηση της αίτησης στη βάση δεδομένων
+        RentalApplication application = rentalApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application not found")); // Αν δεν βρεθεί, πετάμε εξαίρεση
+
+        // Ενημέρωση της κατάστασης της αίτησης
+        application.setStatus(newStatus);
+
+        // Αποθήκευση της αλλαγής στη βάση δεδομένων
+        return rentalApplicationRepository.save(application);
+    }
+}

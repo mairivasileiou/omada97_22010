@@ -1,0 +1,42 @@
+package com.example.demo.user; // Ορισμός του πακέτου όπου ανήκει η κλάση UserController
+
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.web.bind.annotation.*; // Εισαγωγή των annotations για τη διαχείριση REST API endpoints
+
+/**
+ * Η κλάση UserController διαχειρίζεται τα REST API endpoints που σχετίζονται με τους χρήστες.
+ * Επιτρέπει την εγγραφή νέων χρηστών και την επαλήθευση τους από admin.
+ */
+@RestController // Δηλώνει ότι αυτή η κλάση είναι REST Controller και επιστρέφει JSON απαντήσεις
+@RequestMapping("/users") // Ορίζει ότι όλα τα endpoints αυτής της κλάσης θα ξεκινούν με "/users"
+public class UserController {
+
+    @Autowired // Αυτόματη έγχυση του UserService για τη διαχείριση της επιχειρησιακής λογικής
+    private UserService userService;
+
+    /**
+     * Endpoint για την εγγραφή νέου χρήστη.
+     * Χρησιμοποιεί την HTTP μέθοδο POST για να αποθηκεύσει τον χρήστη στη βάση δεδομένων.
+     *
+     * @param user Τα δεδομένα του χρήστη που θα εγγραφεί (έρχονται από το request body)
+     * @return Ο αποθηκευμένος χρήστης στη βάση δεδομένων
+     */
+    @PostMapping("/register") // Ορίζει ότι το endpoint "/users/register" δέχεται αιτήματα τύπου POST
+    public User registerUser(@RequestBody User user) { // Το @RequestBody διαβάζει τα δεδομένα JSON από το request
+        return userService.registerUser(user); // Καλεί την υπηρεσία για εγγραφή χρήστη
+    }
+
+    /**
+     * Endpoint για την επαλήθευση ενός χρήστη.
+     * Αυτή η λειτουργία επιτρέπεται μόνο σε διαχειριστές (Admin).
+     * Χρησιμοποιεί την HTTP μέθοδο PUT για να ενημερώσει την κατάσταση επαλήθευσης του χρήστη.
+     *
+     * @param userId Το ID του χρήστη που θα επαληθευτεί (λαμβάνεται από το path της URL)
+     * @return Ο ενημερωμένος χρήστης μετά την επαλήθευση
+     */
+    @PutMapping("/verify/{userId}") // Ορίζει ότι το endpoint "/users/verify/{userId}" δέχεται αιτήματα τύπου PUT
+    public User verifyUser(@PathVariable Long userId) { // Το @PathVariable διαβάζει το userId από το URL
+        return userService.verifyUser(userId); // Καλεί την υπηρεσία για να επαληθεύσει τον χρήστη
+    }
+}
+

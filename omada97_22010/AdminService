@@ -1,0 +1,51 @@
+package com.example.demo.admin; // Ορισμός του πακέτου όπου ανήκει η κλάση AdminService
+
+import com.example.demo.property.Property; // Εισαγωγή της κλάσης Property, καθώς ο Admin μπορεί να εγκρίνει ακίνητα
+import com.example.demo.user.User; // Εισαγωγή της κλάσης User, καθώς ο Admin μπορεί να επαληθεύει ενοικιαστές
+import com.example.demo.user.UserRepository; // Εισαγωγή του UserRepository για την αναζήτηση και αποθήκευση χρηστών στη βάση
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.stereotype.Service; // Ορισμός της κλάσης ως Service για τη διαχείριση επιχειρησιακής λογικής
+
+/**
+ * Η κλάση AdminService διαχειρίζεται τη λογική που σχετίζεται με τις λειτουργίες του διαχειριστή (Admin).
+ * Παρέχει λειτουργίες για την έγκριση ακινήτων και την επαλήθευση ενοικιαστών.
+ */
+@Service // Δηλώνει ότι η κλάση είναι Spring Service και μπορεί να χρησιμοποιηθεί από άλλα components μέσω @Autowired
+public class AdminService {
+
+    @Autowired // Αυτόματη έγχυση του UserRepository για πρόσβαση στη βάση δεδομένων
+    private UserRepository userRepository;
+
+    /**
+     * Μέθοδος που επιτρέπει στον Admin να εγκρίνει ένα ακίνητο.
+     * Αλλάζει την κατάσταση του ακινήτου σε "Approved".
+     *
+     * @param property Το ακίνητο που πρόκειται να εγκριθεί
+     * @return Το ακίνητο με ενημερωμένη την κατάσταση του
+     */
+    public Property approveProperty(Property property) {
+        property.setStatus("Approved"); // Ορισμός της κατάστασης του ακινήτου ως "Approved" (Εγκρίθηκε)
+        
+        // Σημείωση: Δεν υπάρχει αποθήκευση στη βάση δεδομένων, χρειάζεται PropertyRepository
+        return property; // Επιστρέφει το αντικείμενο property (αργότερα θα αποθηκεύεται μέσω repository)
+    }
+
+    /**
+     * Μέθοδος που επιτρέπει στον Admin να επαληθεύσει έναν ενοικιαστή.
+     * Αν ο ενοικιαστής δεν βρεθεί, πετάει εξαίρεση.
+     *
+     * @param tenantId Το ID του ενοικιαστή που θα επαληθευτεί
+     * @return Ο ενημερωμένος χρήστης μετά την επαλήθευση
+     */
+    public User verifyTenant(Long tenantId) {
+        // Αναζήτηση του ενοικιαστή στη βάση δεδομένων
+        User tenant = userRepository.findById(tenantId)
+                .orElseThrow(() -> new RuntimeException("Tenant not found")); // Αν δεν βρεθεί, πετάμε εξαίρεση
+
+        // Ορισμός του χρήστη ως επαληθευμένου
+        tenant.setVerified(true);
+
+        // Αποθήκευση της αλλαγής στη βάση δεδομένων
+        return userRepository.save(tenant);
+    }
+}

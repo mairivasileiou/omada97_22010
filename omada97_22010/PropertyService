@@ -1,0 +1,62 @@
+package com.example.demo.property; // Ορισμός του πακέτου όπου ανήκει η κλάση PropertyService
+
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.stereotype.Service; // Εισαγωγή του @Service για τον ορισμό της κλάσης ως υπηρεσία (service)
+import java.util.List; // Εισαγωγή της κλάσης List για την επιστροφή λίστας ακινήτων
+
+/**
+ * Η κλάση PropertyService παρέχει τις επιχειρησιακές λειτουργίες (business logic)
+ * για τη διαχείριση των ακινήτων.
+ * Επικοινωνεί με το PropertyRepository για να αποθηκεύει και να ανακτά δεδομένα από τη βάση.
+ */
+@Service // Δηλώνει ότι αυτή η κλάση είναι Spring Service και μπορεί να χρησιμοποιηθεί μέσω @Autowired
+public class PropertyService {
+
+    @Autowired // Αυτόματη έγχυση του PropertyRepository για τη διαχείριση των ακινήτων στη βάση δεδομένων
+    private PropertyRepository propertyRepository;
+
+    /**
+     * Προσθέτει ένα νέο ακίνητο στο σύστημα.
+     * Ορίζει την κατάσταση του ακινήτου ως "Pending" και καταγράφει την ημερομηνία δημιουργίας.
+     *
+     * @param property Το ακίνητο που πρόκειται να αποθηκευτεί
+     * @return Το αποθηκευμένο ακίνητο στη βάση δεδομένων
+     */
+    public Property addProperty(Property property) {
+        property.setStatus("Pending"); // Ορίζουμε την αρχική κατάσταση του ακινήτου ως "Pending" (Αναμονή έγκρισης)
+        property.setCreatedDate(java.time.LocalDateTime.now()); // Καταγραφή της ημερομηνίας δημιουργίας του ακινήτου
+        return propertyRepository.save(property); // Αποθήκευση του ακινήτου στη βάση δεδομένων
+    }
+
+    /**
+     * Επιστρέφει όλα τα εγκεκριμένα ακίνητα.
+     * Αυτή η μέθοδος χρησιμοποιείται από τους ενοικιαστές για να βλέπουν μόνο διαθέσιμα προς ενοικίαση ακίνητα.
+     *
+     * @return Λίστα με όλα τα ακίνητα που έχουν εγκριθεί από τον Admin
+     */
+    public List<Property> getApprovedProperties() {
+        return propertyRepository.findByStatus("Approved"); // Αναζήτηση όλων των ακινήτων με κατάσταση "Approved"
+    }
+
+    /**
+     * Επιστρέφει όλα τα ακίνητα ενός συγκεκριμένου ιδιοκτήτη.
+     * Αυτή η μέθοδος χρησιμοποιείται από τους ιδιοκτήτες για να βλέπουν τα ακίνητα που έχουν καταχωρήσει.
+     *
+     * @param ownerId Το ID του ιδιοκτήτη
+     * @return Λίστα με όλα τα ακίνητα που ανήκουν στον συγκεκριμένο ιδιοκτήτη
+     */
+    public List<Property> getPropertiesByOwner(Long ownerId) {
+        return propertyRepository.findByOwnerId(ownerId); // Αναζήτηση όλων των ακινήτων που ανήκουν σε έναν συγκεκριμένο ιδιοκτήτη
+    }
+
+    /**
+     * Ενημερώνει ένα ακίνητο στη βάση δεδομένων.
+     * Αυτή η μέθοδος μπορεί να χρησιμοποιηθεί για να εγκρίνει ένα ακίνητο ή να αλλάξει λεπτομέρειες του.
+     *
+     * @param property Το ακίνητο που πρόκειται να ενημερωθεί
+     * @return Το ενημερωμένο ακίνητο μετά την αποθήκευση
+     */
+    public Property updateProperty(Property property) {
+        return propertyRepository.save(property); // Αποθήκευση των αλλαγών στο ακίνητο στη βάση δεδομένων
+    }
+}

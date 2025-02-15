@@ -1,0 +1,67 @@
+package com.example.demo.user; // Ορισμός του πακέτου όπου ανήκει η κλάση UserService
+
+import org.springframework.beans.factory.annotation.Autowired; // Χρησιμοποιείται για αυτόματη έγχυση εξαρτήσεων (Dependency Injection)
+import org.springframework.security.crypto.password.PasswordEncoder; // Χρησιμοποιείται για την κρυπτογράφηση των κωδικών
+import org.springframework.stereotype.Service; // Δηλώνει ότι αυτή η κλάση είναι ένα Spring Service
+
+/**
+ * Η κλάση UserService διαχειρίζεται τη λογική που σχετίζεται με τους χρήστες.
+ * Παρέχει λειτουργίες όπως εγγραφή χρήστη, αναζήτηση και επαλήθευση.
+ */
+@Service // Ορίζει την κλάση ως Service ώστε να μπορεί να χρησιμοποιηθεί από άλλα components της εφαρμογής
+public class UserService {
+
+    @Autowired // Αυτόματη έγχυση του UserRepository για πρόσβαση στη βάση δεδομένων
+    private UserRepository userRepository;
+
+    @Autowired // Αυτόματη έγχυση του PasswordEncoder για κρυπτογράφηση κωδικών πρόσβασης
+    private PasswordEncoder passwordEncoder;
+
+    /**
+     * Μέθοδος για την εγγραφή ενός νέου χρήστη.
+     * Κρυπτογραφεί τον κωδικό του χρήστη πριν την αποθήκευση.
+     *
+     * @param user Το αντικείμενο χρήστη που θα αποθηκευτεί
+     * @return Ο αποθηκευμένος χρήστης στη βάση δεδομένων
+     */
+    public User registerUser(User user) {
+        // Κρυπτογράφηση του κωδικού πριν την αποθήκευση στη βάση
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // Ορίζουμε τον χρήστη ως μη επαληθευμένο από προεπιλογή
+        user.setVerified(false); 
+
+        // Αποθήκευση του χρήστη στη βάση δεδομένων
+        return userRepository.save(user);
+    }
+
+    /**
+     * Μέθοδος που αναζητά έναν χρήστη με βάση το username του.
+     * Χρησιμοποιείται για login ή αυθεντικοποίηση.
+     *
+     * @param username Το όνομα χρήστη που αναζητούμε
+     * @return Το αντικείμενο User αν βρεθεί, διαφορετικά επιστρέφει null
+     */
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    /**
+     * Μέθοδος για την επαλήθευση ενός χρήστη (π.χ. από διαχειριστή).
+     * Αν ο χρήστης δεν βρεθεί, πετάει εξαίρεση.
+     *
+     * @param userId Το μοναδικό ID του χρήστη που θα επαληθευτεί
+     * @return Ο ενημερωμένος χρήστης μετά την επαλήθευση
+     */
+    public User verifyUser(Long userId) {
+        // Αναζήτηση χρήστη στη βάση δεδομένων
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found")); // Αν δεν βρεθεί, πετάμε εξαίρεση
+
+        // Ορίζουμε τον χρήστη ως επαληθευμένο
+        user.setVerified(true);
+
+        // Αποθήκευση της αλλαγής στη βάση δεδομένων
+        return userRepository.save(user);
+    }
+}

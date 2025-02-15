@@ -1,0 +1,30 @@
+package com.example.demo.property; // Ορισμός του πακέτου όπου ανήκει η διεπαφή PropertyRepository
+
+import org.springframework.data.jpa.repository.JpaRepository; // Εισαγωγή του JpaRepository για τη διαχείριση της βάσης δεδομένων
+import java.util.List; // Εισαγωγή της λίστας για την επιστροφή πολλαπλών αποτελεσμάτων
+
+/**
+ * Το PropertyRepository είναι ένα interface που παρέχει τις βασικές λειτουργίες διαχείρισης ακινήτων.
+ * Επεκτείνει το JpaRepository, το οποίο επιτρέπει CRUD λειτουργίες (Create, Read, Update, Delete)
+ * χωρίς την ανάγκη να γράψουμε SQL queries.
+ */
+public interface PropertyRepository extends JpaRepository<Property, Long> { // Ορίζει το Repository για την οντότητα Property με Primary Key τύπου Long
+
+    /**
+     * Μέθοδος που επιστρέφει όλα τα εγκεκριμένα ακίνητα.
+     * Χρησιμοποιείται για την εμφάνιση μόνο των ακινήτων που έχουν εγκριθεί από τον διαχειριστή.
+     *
+     * @param status Η κατάσταση του ακινήτου (π.χ. "Approved", "Pending", "Rejected")
+     * @return Λίστα με όλα τα ακίνητα που έχουν την επιλεγμένη κατάσταση
+     */
+    List<Property> findByStatus(String status); // Επιστρέφει όλα τα ακίνητα με συγκεκριμένη κατάσταση
+
+    /**
+     * Μέθοδος που επιστρέφει όλα τα ακίνητα ενός συγκεκριμένου ιδιοκτήτη.
+     * Χρησιμοποιείται ώστε κάθε ιδιοκτήτης να βλέπει τα δικά του ακίνητα.
+     *
+     * @param ownerId Το ID του ιδιοκτήτη
+     * @return Λίστα με όλα τα ακίνητα που ανήκουν στον συγκεκριμένο ιδιοκτήτη
+     */
+    List<Property> findByOwnerId(Long ownerId); // Επιστρέφει όλα τα ακίνητα ενός συγκεκριμένου ιδιοκτήτη
+}

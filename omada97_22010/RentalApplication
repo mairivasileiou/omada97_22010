@@ -1,0 +1,107 @@
+package com.example.demo.rentalapplication; // Ορισμός του πακέτου όπου ανήκει η κλάση RentalApplication
+
+import jakarta.persistence.*; // Εισαγωγή των annotations του JPA για τη διαχείριση της βάσης δεδομένων
+import java.time.LocalDateTime; // Εισαγωγή της κλάσης LocalDateTime για την αποθήκευση χρονικών στιγμών
+
+/**
+ * Η κλάση RentalApplication αναπαριστά μια αίτηση ενοικίασης που υποβάλλεται από έναν ενοικιαστή για ένα ακίνητο.
+ * Αποθηκεύεται στη βάση δεδομένων και συνδέεται με ένα ακίνητο (Property) και έναν ενοικιαστή (Tenant).
+ */
+@Entity // Δηλώνει ότι αυτή η κλάση είναι οντότητα στη βάση δεδομένων
+public class RentalApplication {
+
+    @Id // Ορισμός του primary key της οντότητας
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Αυτόματη αύξηση του ID από τη βάση δεδομένων
+    private Long applicationId; // Μοναδικό αναγνωριστικό της αίτησης ενοικίασης (Primary Key)
+
+    private Long propertyId; // Συνδέει την αίτηση με το αντίστοιχο ακίνητο (Property)
+
+    private Long tenantId; // Συνδέει την αίτηση με τον ενοικιαστή (Tenant - User)
+
+    private String status; // Κατάσταση της αίτησης ("Pending", "Approved", "Rejected")
+
+    private LocalDateTime submissionDate; // Ημερομηνία και ώρα υποβολής της αίτησης
+
+    // =========================== Getters & Setters ===========================
+
+    /**
+     * Επιστρέφει το μοναδικό αναγνωριστικό της αίτησης ενοικίασης.
+     */
+    public Long getApplicationId() {
+        return applicationId;
+    }
+
+    /**
+     * Ορίζει το μοναδικό αναγνωριστικό της αίτησης ενοικίασης.
+     */
+    public void setApplicationId(Long applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    /**
+     * Επιστρέφει το αναγνωριστικό του ακινήτου που σχετίζεται με την αίτηση.
+     */
+    public Long getPropertyId() {
+        return propertyId;
+    }
+
+    /**
+     * Ορίζει το αναγνωριστικό του ακινήτου που σχετίζεται με την αίτηση.
+     */
+    public void setPropertyId(Long propertyId) {
+        this.propertyId = propertyId;
+    }
+
+    /**
+     * Επιστρέφει το αναγνωριστικό του ενοικιαστή που υπέβαλε την αίτηση.
+     */
+    public Long getTenantId() {
+        return tenantId;
+    }
+
+    /**
+     * Ορίζει το αναγνωριστικό του ενοικιαστή που υπέβαλε την αίτηση.
+     */
+    public void setTenantId(Long tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    /**
+     * Επιστρέφει την τρέχουσα κατάσταση της αίτησης.
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * Ορίζει την κατάσταση της αίτησης (π.χ. "Pending", "Approved", "Rejected").
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * Επιστρέφει την ημερομηνία και ώρα υποβολής της αίτησης.
+     */
+    public LocalDateTime getSubmissionDate() {
+        return submissionDate;
+    }
+
+    /**
+     * Ορίζει την ημερομηνία και ώρα υποβολής της αίτησης.
+     */
+    public void setSubmissionDate(LocalDateTime submissionDate) {
+        this.submissionDate = submissionDate;
+    }
+
+    // =========================== Business Methods ===========================
+
+    /**
+     * Υποβάλλει μια νέα αίτηση ενοικίασης.
+     * Ορίζει την ημερομηνία υποβολής στην τρέχουσα χρονική στιγμή και την κατάσταση ως "Pending".
+     */
+    public void submitApplication() {
+        this.submissionDate = LocalDateTime.now(); // Ορισμός της ημερομηνίας υποβολής στην τρέχουσα χρονική στιγμή
+        this.status = "Pending"; // Ορισμός της αρχικής κατάστασης ως "Pending" (Σε αναμονή)
+    }
+}

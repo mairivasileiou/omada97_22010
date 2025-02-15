@@ -1,0 +1,76 @@
+package com.example.demo.config; // Ορισμός του πακέτου όπου ανήκει η κλάση SecurityConfig
+
+import com.example.demo.user.UserService; // Εισαγωγή της υπηρεσίας UserService για τη διαχείριση των χρηστών
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.context.annotation.Bean; // Εισαγωγή του @Bean για τη δημιουργία bean αντικειμένων στο Spring
+import org.springframework.context.annotation.Configuration; // Εισαγωγή του @Configuration για τον ορισμό της κλάσης ως διαμόρφωση (configuration)
+import org.springframework.security.authentication.AuthenticationManager; // Διαχείριση ελέγχου ταυτότητας
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder; // Χτίσιμο του AuthenticationManager
+import org.springframework.security.config.annotation.web.builders.HttpSecurity; // Ρύθμιση κανόνων ασφαλείας
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Κρυπτογράφηση κωδικών με BCrypt
+import org.springframework.security.crypto.password.PasswordEncoder; // Διαχείριση κρυπτογράφησης κωδικών
+import org.springframework.security.web.SecurityFilterChain; // Ορισμός της αλυσίδας ασφαλείας (SecurityFilterChain)
+
+/**
+ * Η κλάση SecurityConfig διαμορφώνει την ασφάλεια της εφαρμογής.
+ * Χρησιμοποιεί Spring Security για έλεγχο ταυτότητας και εξουσιοδότησης χρηστών.
+ */
+@Configuration // Δηλώνει ότι αυτή η κλάση περιέχει ρυθμίσεις διαμόρφωσης για το Spring
+public class SecurityConfig {
+
+    @Autowired // Αυτόματη έγχυση της υπηρεσίας UserService για την ανάκτηση χρηστών από τη βάση δεδομένων
+    private UserService userService;
+
+    /**
+     * Bean για την κρυπτογράφηση των κωδικών πρόσβασης των χρηστών.
+     * Χρησιμοποιεί BCrypt, έναν ασφαλή αλγόριθμο κρυπτογράφησης.
+     *
+     * @return Αντικείμενο PasswordEncoder για κρυπτογράφηση των κωδικών
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Bean που διαμορφώνει τον διαχειριστή ταυτότητας (AuthenticationManager).
+     * Ορίζει ότι η ταυτότητα των χρηστών θα ελέγχεται μέσω του UserService και οι κωδικοί θα είναι κρυπτογραφημένοι.
+     *
+     * @param http Το αντικείμενο HttpSecurity που διαχειρίζεται την ασφάλεια της εφαρμογής
+     * @param passwordEncoder Το εργαλείο κρυπτογράφησης των κωδικών πρόσβασης
+     * @return Ένα αντικείμενο AuthenticationManager που θα διαχειρίζεται την ταυτοποίηση των χρηστών
+     * @throws Exception Αν υπάρξει σφάλμα στη διαμόρφωση
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder)
+            throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .userDetailsService(userService) // Χρησιμοποιεί το UserService για ανάκτηση χρηστών
+                .passwordEncoder(passwordEncoder) // Χρησιμοποιεί το PasswordEncoder για έλεγχο των κωδικών
+                .and()
+                .build();
+    }
+
+    /**
+     * Bean που ορίζει την αλυσίδα ασφαλείας (SecurityFilterChain).
+     * Διαμορφώνει τους κανόνες πρόσβασης στις διάφορες διαδρομές (endpoints) της εφαρμογής.
+     *
+     * @param http Το αντικείμενο HttpSecurity που διαχειρίζεται την ασφάλεια της εφαρμογής
+     * @return Ένα αντικείμενο SecurityFilterChain που περιέχει τους κανόνες ασφαλείας
+     * @throws Exception Αν υπάρξει σφάλμα στη διαμόρφωση
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable() // Απενεργοποιεί το CSRF (Cross-Site Request Forgery) για απλοποίηση δοκιμών
+            .authorizeRequests() // Ορίζει τα δικαιώματα πρόσβασης
+            .antMatchers("/users/register", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // Επιτρέπει πρόσβαση σε συγκεκριμένα δημόσια endpoints
+            .antMatchers("/admin/**").hasRole("ADMIN") // Μόνο οι Admins μπορούν να προσπελάσουν τα "/admin/**" endpoints
+            .antMatchers("/properties/owner/**").hasRole("LANDLORD") // Μόνο οι ιδιοκτήτες μπορούν να προσπελάσουν τα "/properties/owner/**"
+            .antMatchers("/rental-applications/**").hasAnyRole("LANDLORD", "TENANT") // Οι ιδιοκτήτες και οι ενοικιαστές μπορούν να προσπελάσουν αυτά τα endpoints
+            .anyRequest().authenticated() // Όλα τα υπόλοιπα endpoints απαιτούν ταυτοποίηση χρήστη
+            .and()
+            .httpBasic(); // Χρησιμοποιεί βασικό authentication (username & password μέσω HTTP)
+
+        return http.build(); // Επιστρέφει την τελική διαμόρφωση της ασφάλειας
+    }
+}

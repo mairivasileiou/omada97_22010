@@ -1,0 +1,130 @@
+package com.example.demo.user; // Ορισμός του πακέτου όπου ανήκει η κλάση User
+
+import jakarta.persistence.*; // Εισαγωγή των απαραίτητων βιβλιοθηκών για τη χρήση των annotations του JPA
+
+/**
+ * Η κλάση User αναπαριστά έναν χρήστη στο σύστημα και αποθηκεύεται στη βάση δεδομένων.
+ * Χρησιμοποιεί το JPA για τη διαχείριση της αποθήκευσής της.
+ */
+@Entity // Δηλώνει ότι η κλάση αυτή είναι οντότητα στη βάση δεδομένων
+@Inheritance(strategy = InheritanceType.JOINED) // Ορίζει ότι οι υποκλάσεις της θα αποθηκεύονται με στρατηγική JOINED
+public class User {
+
+    @Id // Ορίζει το πρωτεύον κλειδί της οντότητας
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Καθορίζει ότι το userId θα παράγεται αυτόματα από τη βάση δεδομένων
+    private Long userId; // Αναγνωριστικό χρήστη (Primary Key)
+
+    private String username; // Όνομα χρήστη για την είσοδο στο σύστημα
+
+    private String password; // Κωδικός πρόσβασης του χρήστη (πρέπει να είναι κρυπτογραφημένος)
+
+    private String email; // Διεύθυνση email του χρήστη για επικοινωνία και ανάκτηση κωδικού
+
+    private String role; // Ο ρόλος του χρήστη στο σύστημα (Admin, Landlord, Tenant)
+
+    private boolean verified; // Αν ο χρήστης έχει επαληθευτεί ή όχι
+
+    // =========================== Getters & Setters ===========================
+
+    /**
+     * Επιστρέφει το μοναδικό αναγνωριστικό του χρήστη.
+     */
+    public Long getUserId() {
+        return userId;
+    }
+
+    /**
+     * Ορίζει το μοναδικό αναγνωριστικό του χρήστη.
+     */
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Επιστρέφει το όνομα χρήστη.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Ορίζει το όνομα χρήστη.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * Επιστρέφει τον κωδικό πρόσβασης.
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Ορίζει τον κωδικό πρόσβασης.
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * Επιστρέφει το email του χρήστη.
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Ορίζει το email του χρήστη.
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * Επιστρέφει τον ρόλο του χρήστη (Admin, Landlord, Tenant).
+     */
+    public String getRole() {
+        return role;
+    }
+
+    /**
+     * Ορίζει τον ρόλο του χρήστη.
+     */
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    /**
+     * Επιστρέφει αν ο χρήστης έχει επαληθευτεί.
+     */
+    public boolean isVerified() {
+        return verified;
+    }
+
+    /**
+     * Ορίζει αν ο χρήστης έχει επαληθευτεί.
+     */
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    // =========================== Business Methods ===========================
+
+    /**
+     * Μέθοδος για τη διαδικασία σύνδεσης του χρήστη.
+     * Αυτή η μέθοδος θα πρέπει να υλοποιηθεί στο service επίπεδο.
+     */
+    public void login() {
+        // Λογική για τη σύνδεση του χρήστη (placeholder - θα υλοποιηθεί στο service layer)
+    }
+
+    /**
+     * Μέθοδος για την εγγραφή του χρήστη στο σύστημα.
+     * Θα πρέπει να περιλαμβάνει την αποθήκευση του χρήστη στη βάση δεδομένων και την κρυπτογράφηση του κωδικού.
+     */
+    public void register() {
+        // Λογική για την εγγραφή χρήστη (placeholder - θα υλοποιηθεί στο service layer)
+    }
+}

@@ -1,0 +1,66 @@
+package com.example.demo.property; // Ορισμός του πακέτου όπου ανήκει η κλάση PropertyController
+
+import org.springframework.beans.factory.annotation.Autowired; // Εισαγωγή του @Autowired για αυτόματη έγχυση εξαρτήσεων
+import org.springframework.web.bind.annotation.*; // Εισαγωγή των annotations για τη διαχείριση REST API endpoints
+import java.util.List; // Εισαγωγή της κλάσης List για την επιστροφή λίστας ακινήτων
+
+/**
+ * Η κλάση PropertyController διαχειρίζεται τα REST API endpoints που σχετίζονται με τα ακίνητα.
+ * Επιτρέπει την προσθήκη, προβολή, ενημέρωση και ανάκτηση ακινήτων βάσει διαφόρων κριτηρίων.
+ */
+@RestController // Δηλώνει ότι αυτή η κλάση είναι REST Controller και επιστρέφει JSON απαντήσεις
+@RequestMapping("/properties") // Ορίζει ότι όλα τα endpoints αυτής της κλάσης θα ξεκινούν με "/properties"
+public class PropertyController {
+
+    @Autowired // Αυτόματη έγχυση του PropertyService για τη διαχείριση της επιχειρησιακής λογικής
+    private PropertyService propertyService;
+
+    /**
+     * Endpoint για την προσθήκη νέου ακινήτου.
+     * Χρησιμοποιεί την HTTP μέθοδο POST για να δημιουργήσει ένα νέο ακίνητο.
+     *
+     * @param property Τα δεδομένα του ακινήτου που θα καταχωρηθεί (λαμβάνονται από το request body)
+     * @return Το αποθηκευμένο ακίνητο στη βάση δεδομένων
+     */
+    @PostMapping // Ορίζει ότι το endpoint "/properties" δέχεται αιτήματα τύπου POST
+    public Property addProperty(@RequestBody Property property) { // Το @RequestBody διαβάζει τα δεδομένα JSON από το request
+        return propertyService.addProperty(property); // Καλεί την υπηρεσία για προσθήκη του ακινήτου
+    }
+
+    /**
+     * Endpoint που επιστρέφει όλα τα εγκεκριμένα ακίνητα.
+     * Χρησιμοποιείται από τους ενοικιαστές για την εμφάνιση διαθέσιμων προς ενοικίαση ακινήτων.
+     *
+     * @return Λίστα με όλα τα εγκεκριμένα ακίνητα
+     */
+    @GetMapping // Ορίζει ότι το endpoint "/properties" δέχεται αιτήματα τύπου GET
+    public List<Property> getApprovedProperties() {
+        return propertyService.getApprovedProperties(); // Καλεί την υπηρεσία για ανάκτηση των εγκεκριμένων ακινήτων
+    }
+
+    /**
+     * Endpoint που επιστρέφει όλα τα ακίνητα ενός συγκεκριμένου ιδιοκτήτη.
+     * Επιτρέπει στους ιδιοκτήτες να βλέπουν τα ακίνητά τους.
+     *
+     * @param ownerId Το ID του ιδιοκτήτη που αναζητά τα ακίνητά του (λαμβάνεται από το path της URL)
+     * @return Λίστα με όλα τα ακίνητα του συγκεκριμένου ιδιοκτήτη
+     */
+    @GetMapping("/owner/{ownerId}") // Ορίζει ότι το endpoint "/properties/owner/{ownerId}" δέχεται αιτήματα τύπου GET
+    public List<Property> getPropertiesByOwner(@PathVariable Long ownerId) { // Το @PathVariable διαβάζει το ownerId από το URL
+        return propertyService.getPropertiesByOwner(ownerId); // Καλεί την υπηρεσία για ανάκτηση των ακινήτων του ιδιοκτήτη
+    }
+
+    /**
+     * Endpoint για την ενημέρωση ενός ακινήτου.
+     * Χρησιμοποιείται για να ενημερώσει τα δεδομένα ενός ακινήτου, όπως η έγκρισή του από τον Admin.
+     *
+     * @param propertyId Το ID του ακινήτου που θα ενημερωθεί (λαμβάνεται από το path της URL)
+     * @param updatedProperty Τα ενημερωμένα δεδομένα του ακινήτου (λαμβάνονται από το request body)
+     * @return Το ενημερωμένο ακίνητο μετά την αποθήκευση
+     */
+    @PutMapping("/{propertyId}") // Ορίζει ότι το endpoint "/properties/{propertyId}" δέχεται αιτήματα τύπου PUT
+    public Property updateProperty(@PathVariable Long propertyId, @RequestBody Property updatedProperty) { 
+        updatedProperty.setPropertyId(propertyId); // Ορίζουμε το ID του ακινήτου πριν την ενημέρωση
+        return propertyService.updateProperty(updatedProperty); // Καλεί την υπηρεσία για ενημέρωση του ακινήτου
+    }
+}
